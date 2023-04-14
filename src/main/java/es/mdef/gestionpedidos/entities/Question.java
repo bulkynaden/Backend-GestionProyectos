@@ -49,4 +49,14 @@ public class Question {
     public void setUser(User user) {
         this.user = user;
     }
+
+    @Override
+    public String toString() {
+        return "Question{" +
+                "id=" + id +
+                ", statement='" + statement + '\'' +
+                ", user=" + user +
+                ", family=" + family +
+                '}';
+    }
 }

@@ -1,10 +1,13 @@
 package es.mdef.gestionpedidos.controllers;
 
 import es.mdef.gestionpedidos.assemblers.FamilyAssembler;
+import es.mdef.gestionpedidos.assemblers.QuestionListAssembler;
 import es.mdef.gestionpedidos.entities.FamilyImpl;
+import es.mdef.gestionpedidos.entities.Question;
 import es.mdef.gestionpedidos.errors.RegisterNotFoundException;
 import es.mdef.gestionpedidos.models.FamilyModel;
 import es.mdef.gestionpedidos.models.FamilyPostModel;
+import es.mdef.gestionpedidos.models.QuestionListModel;
 import es.mdef.gestionpedidos.repositories.FamilyRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,11 +28,13 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 public class FamiliesController {
     private final FamilyRepository familyRepository;
     private final FamilyAssembler familyAssembler;
+    private final QuestionListAssembler questionListAssembler;
     private final Logger log;
 
-    public FamiliesController(FamilyRepository familyRepository, FamilyAssembler familyAssembler) {
+    public FamiliesController(FamilyRepository familyRepository, FamilyAssembler familyAssembler, QuestionListAssembler questionListAssembler) {
         this.familyRepository = familyRepository;
         this.familyAssembler = familyAssembler;
+        this.questionListAssembler = questionListAssembler;
         this.log = LoggerFactory.getLogger(FamiliesController.class);
     }
 
@@ -69,6 +74,17 @@ public class FamiliesController {
 
         FamilyImpl updatedFamily = familyRepository.save(family);
         return familyAssembler.toModel(updatedFamily);
+    }
+
+    @GetMapping("{id}/questions")
+    public CollectionModel<QuestionListModel> questions(@PathVariable Long id) {
+        List<Question> questions = familyRepository.findById(id)
+                .orElseThrow(() -> new RegisterNotFoundException(id, "family"))
+                .getQuestions();
+        return CollectionModel.of(
+                questions.stream().map(questionListAssembler::toModel).collect(Collectors.toList()),
+                linkTo(methodOn(FamiliesController.class).one(id)).slash("questions").withSelfRel()
+        );
     }
 }
 

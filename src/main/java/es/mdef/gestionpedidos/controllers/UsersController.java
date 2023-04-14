@@ -73,7 +73,7 @@ public class UsersController {
     }
 
     @GetMapping("{id}/questions")
-    public CollectionModel<QuestionListModel> allQuestions(@PathVariable Long id) {
+    public CollectionModel<QuestionListModel> questions(@PathVariable Long id) {
         User user = repository.findById(id)
                 .orElseThrow(() -> new RegisterNotFoundException(id, "usuario"));
         return questionListAssembler.toCollection(questionRepository.findQuestionByUser(user));

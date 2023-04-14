@@ -17,13 +17,14 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/questions")
 public class QuestionsController {
-    private final QuestionRepository repositorio;
+    private final QuestionRepository questionRepository;
     private final QuestionAssembler assembler;
     private final QuestionListAssembler listAssembler;
     private final Logger log;
 
-    public QuestionsController(QuestionRepository repositorio, QuestionAssembler assembler, QuestionListAssembler listAssembler) {
-        this.repositorio = repositorio;
+
+    public QuestionsController(QuestionRepository questionRepository, QuestionAssembler assembler, QuestionListAssembler listAssembler) {
+        this.questionRepository = questionRepository;
         this.assembler = assembler;
         this.listAssembler = listAssembler;
         this.log = GestionPedidosApplication.log;
@@ -31,14 +32,14 @@ public class QuestionsController {
 
     @PostMapping
     public EntityModel<Question> add(@RequestBody QuestionPostModel model) {
-        Question question = repositorio.save(assembler.toEntity(model));
+        Question question = questionRepository.save(assembler.toEntity(model));
         log.info("Añadida " + question);
         return assembler.toModel(question);
     }
 
     @GetMapping("{id}")
     public EntityModel<Question> one(@PathVariable Long id) {
-        Question question = repositorio.findById(id)
+        Question question = questionRepository.findById(id)
                 .orElseThrow(() -> new RegisterNotFoundException(id, "pregunta"));
         log.info("Recuperado " + question);
         return assembler.toModel(question);
@@ -46,15 +47,15 @@ public class QuestionsController {
 
     @GetMapping
     public CollectionModel<QuestionListModel> all() {
-        return listAssembler.toCollection(repositorio.findAll());
+        return listAssembler.toCollection(questionRepository.findAll());
     }
 
     @PutMapping("{id}")
     public EntityModel<Question> edit(@PathVariable Long id, @RequestBody QuestionModel model) {
-        Question question = repositorio.findById(id).map(q -> {
+        Question question = questionRepository.findById(id).map(q -> {
                     q.setStatement(model.getStatement());
                     q.setUser(model.getUser());
-                    return repositorio.save(q);
+                    return questionRepository.save(q);
                 })
                 .orElseThrow(() -> new RegisterNotFoundException(id, "pregunta"));
         log.info("Actualizado " + question);
@@ -64,6 +65,6 @@ public class QuestionsController {
     @DeleteMapping("{id}")
     public void delete(@PathVariable Long id) {
         log.info("Borrada pregunta " + id);
-        repositorio.deleteById(id);
+        questionRepository.deleteById(id);
     }
 }

@@ -17,7 +17,8 @@ public class FamilyAssembler implements RepresentationModelAssembler<FamilyImpl,
     public EntityModel<FamilyImpl> toModel(FamilyImpl entity) {
         EntityModel<FamilyImpl> model = EntityModel.of(entity);
         model.add(
-                linkTo(methodOn(FamiliesController.class).one(entity.getId())).withSelfRel()
+                linkTo(methodOn(FamiliesController.class).one(entity.getId())).withSelfRel(),
+                linkTo(methodOn(FamiliesController.class).questions(entity.getId())).withRel("questions")
         );
         return model;
     }
