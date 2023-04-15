@@ -2,7 +2,9 @@ package es.mdef.gestionpedidos.controllers;
 
 import es.mdef.gestionpedidos.GestionPedidosApplication;
 import es.mdef.gestionpedidos.assemblers.*;
+import es.mdef.gestionpedidos.constants.UserEnums;
 import es.mdef.gestionpedidos.entities.Administrator;
+import es.mdef.gestionpedidos.entities.NotAdministrator;
 import es.mdef.gestionpedidos.entities.Question;
 import es.mdef.gestionpedidos.entities.User;
 import es.mdef.gestionpedidos.errors.RegisterNotFoundException;
@@ -111,16 +113,19 @@ public class UsersController {
 
     @PutMapping("{id}")
     public EntityModel<UserModel> edit(@Valid @RequestBody UserPutModel model, @PathVariable Long id) {
-        User user = userRepository.findById(id).map(u -> {
-                    u.setName(model.getName());
-                    u.setUsername(model.getUsername());
-                    u.setAccountNonExpired(model.isAccountNonExpired());
-                    u.setEnabled(model.isEnabled());
-                    u.setCredentialsNonExpired(model.isCredentialsNonExpired());
-                    u.setAccountNonLocked(model.isAccountNonLocked());
-                    return userRepository.save(u);
-                })
-                .orElseThrow(() -> new RegisterNotFoundException(id, "usuario"));
+        User user = userRepository.findById(id).orElseThrow(() -> new RegisterNotFoundException(id, "usuario"));
+
+        if (model.getRole() == UserEnums.Role.Admin) {
+            ((Administrator) user).setPhone(model.getPhone());
+        } else if (model.getRole() == UserEnums.Role.NotAdmin) {
+            ((NotAdministrator) user).setType(model.getType());
+            ((NotAdministrator) user).setDepartment(model.getDepartment());
+        }
+        user.setName(model.getName());
+        user.setUsername(model.getUsername());
+
+        userRepository.save(user);
+
         log.info("Actualizado " + user);
         return userAssembler.toModel(user);
     }
