@@ -55,6 +55,10 @@ public class UserAssembler implements RepresentationModelAssembler<User, EntityM
                 model.getName(),
                 model.getUsername());
         user.setPassword(model.getPassword());
+        user.setEnabled(true);
+        user.setAccountNonLocked(true);
+        user.setCredentialsNonExpired(true);
+        user.setAccountNonExpired(true);
         return user;
     }
 

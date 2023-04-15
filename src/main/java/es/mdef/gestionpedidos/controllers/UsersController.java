@@ -114,6 +114,10 @@ public class UsersController {
         User user = userRepository.findById(id).map(u -> {
                     u.setName(model.getName());
                     u.setUsername(model.getUsername());
+                    u.setAccountNonExpired(model.isAccountNonExpired());
+                    u.setEnabled(model.isEnabled());
+                    u.setCredentialsNonExpired(model.isCredentialsNonExpired());
+                    u.setAccountNonLocked(model.isAccountNonLocked());
                     return userRepository.save(u);
                 })
                 .orElseThrow(() -> new RegisterNotFoundException(id, "usuario"));
