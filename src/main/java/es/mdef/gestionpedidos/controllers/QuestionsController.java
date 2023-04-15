@@ -5,10 +5,11 @@ import es.mdef.gestionpedidos.assemblers.QuestionAssembler;
 import es.mdef.gestionpedidos.assemblers.QuestionListAssembler;
 import es.mdef.gestionpedidos.entities.Question;
 import es.mdef.gestionpedidos.errors.RegisterNotFoundException;
-import es.mdef.gestionpedidos.models.QuestionListModel;
-import es.mdef.gestionpedidos.models.QuestionModel;
-import es.mdef.gestionpedidos.models.QuestionPostModel;
+import es.mdef.gestionpedidos.models.question.QuestionListModel;
+import es.mdef.gestionpedidos.models.question.QuestionModel;
+import es.mdef.gestionpedidos.models.question.QuestionPostModel;
 import es.mdef.gestionpedidos.repositories.QuestionRepository;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
@@ -30,15 +31,9 @@ public class QuestionsController {
         this.log = GestionPedidosApplication.log;
     }
 
-    @PostMapping
-    public EntityModel<Question> add(@RequestBody QuestionPostModel model) {
-        Question question = questionRepository.save(assembler.toEntity(model));
-        log.info("Añadida " + question);
-        return assembler.toModel(question);
-    }
 
     @GetMapping("{id}")
-    public EntityModel<Question> one(@PathVariable Long id) {
+    public EntityModel<QuestionModel> one(@PathVariable Long id) {
         Question question = questionRepository.findById(id)
                 .orElseThrow(() -> new RegisterNotFoundException(id, "pregunta"));
         log.info("Recuperado " + question);
@@ -47,11 +42,19 @@ public class QuestionsController {
 
     @GetMapping
     public CollectionModel<QuestionListModel> all() {
+        log.info("Recuperadas preguntas");
         return listAssembler.toCollection(questionRepository.findAll());
     }
 
+    @PostMapping
+    public EntityModel<QuestionModel> add(@Valid @RequestBody QuestionPostModel model) {
+        Question question = questionRepository.save(assembler.toEntity(model));
+        log.info("Añadida " + question);
+        return assembler.toModel(question);
+    }
+
     @PutMapping("{id}")
-    public EntityModel<Question> edit(@PathVariable Long id, @RequestBody QuestionModel model) {
+    public EntityModel<QuestionModel> edit(@Valid @RequestBody QuestionPostModel model, @PathVariable Long id) {
         Question question = questionRepository.findById(id).map(q -> {
                     q.setStatement(model.getStatement());
                     q.setUser(model.getUser());

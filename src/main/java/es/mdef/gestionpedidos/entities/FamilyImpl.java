@@ -1,18 +1,25 @@
 package es.mdef.gestionpedidos.entities;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "families")
+@Table(name = "families", uniqueConstraints = {
+        @UniqueConstraint(name = "enunciado", columnNames = "statement")
+})
 public class FamilyImpl implements Family {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @NotBlank(message = "El enunciado es obligatorio")
+    @Size(max = 100, min = 5, message = "El enunciado debe contener entre 5 y 100 caracteres")
+    @Column(nullable = false, unique = true)
     private String statement;
-    
+
     @OneToMany(mappedBy = "family")
     private List<Question> questions = new ArrayList<>();
 

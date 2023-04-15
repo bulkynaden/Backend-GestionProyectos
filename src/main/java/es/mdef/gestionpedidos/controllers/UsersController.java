@@ -1,100 +1,161 @@
 package es.mdef.gestionpedidos.controllers;
 
 import es.mdef.gestionpedidos.GestionPedidosApplication;
-import es.mdef.gestionpedidos.assemblers.QuestionAssembler;
-import es.mdef.gestionpedidos.assemblers.QuestionListAssembler;
-import es.mdef.gestionpedidos.assemblers.UserAssembler;
-import es.mdef.gestionpedidos.assemblers.UserListAssembler;
+import es.mdef.gestionpedidos.assemblers.*;
+import es.mdef.gestionpedidos.entities.Administrator;
 import es.mdef.gestionpedidos.entities.Question;
 import es.mdef.gestionpedidos.entities.User;
 import es.mdef.gestionpedidos.errors.RegisterNotFoundException;
-import es.mdef.gestionpedidos.models.*;
+import es.mdef.gestionpedidos.models.family.FamilyListModel;
+import es.mdef.gestionpedidos.models.question.QuestionListModel;
+import es.mdef.gestionpedidos.models.question.QuestionModel;
+import es.mdef.gestionpedidos.models.question.QuestionPostModel;
+import es.mdef.gestionpedidos.models.user.*;
+import es.mdef.gestionpedidos.repositories.FamilyRepository;
 import es.mdef.gestionpedidos.repositories.QuestionRepository;
 import es.mdef.gestionpedidos.repositories.UserRepository;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
+import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/users")
 public class UsersController {
-    private final UserRepository repository;
+    private final UserRepository userRepository;
     private final QuestionRepository questionRepository;
-    private final UserAssembler assembler;
+    private final FamilyRepository familyRepository;
+    private final UserAssembler userAssembler;
     private final QuestionAssembler questionAssembler;
-    private final UserListAssembler listAssembler;
+    private final UserListAssembler userListAssembler;
     private final QuestionListAssembler questionListAssembler;
+    private final FamilyListAssembler familyListAssembler;
     private final Logger log;
+    private final JdbcTemplate jdbcTemplate;
 
-    public UsersController(UserRepository repositorio,
+
+    public UsersController(UserRepository userRepository,
                            QuestionRepository questionRepository,
-                           UserAssembler assembler,
+                           FamilyRepository familyRepository,
+                           UserAssembler userAssembler,
                            QuestionAssembler questionAssembler,
-                           UserListAssembler listAssembler,
-                           QuestionListAssembler questionListAssembler) {
-        this.repository = repositorio;
+                           UserListAssembler userListAssembler,
+                           QuestionListAssembler questionListAssembler,
+                           FamilyListAssembler familyListAssembler, JdbcTemplate jdbcTemplate) {
+        this.userRepository = userRepository;
         this.questionRepository = questionRepository;
-        this.assembler = assembler;
+        this.familyRepository = familyRepository;
+        this.userAssembler = userAssembler;
         this.questionAssembler = questionAssembler;
-        this.listAssembler = listAssembler;
+        this.userListAssembler = userListAssembler;
         this.questionListAssembler = questionListAssembler;
+        this.familyListAssembler = familyListAssembler;
+        this.jdbcTemplate = jdbcTemplate;
         this.log = GestionPedidosApplication.log;
     }
 
-    @PostMapping
-    public EntityModel<User> add(@RequestBody UserPostModel model) {
-        User user = repository.save(assembler.toEntity(model));
-        log.info("Añadido " + user);
-        return assembler.toModel(user);
-    }
-
-    @PostMapping("{id}/add-question")
-    public EntityModel<Question> addQuestion(@RequestBody QuestionModel model, @PathVariable Long id) {
-        User user = repository.findById(id)
-                .orElseThrow(() -> new RegisterNotFoundException(id, "usuario"));
-        model.setUser(user);
-        Question question = questionRepository.save(questionAssembler.toEntity(model));
-        log.info("Añadida " + question);
-        return questionAssembler.toModel(question);
-    }
-
     @GetMapping("{id}")
-    public EntityModel<User> one(@PathVariable Long id) {
-        User user = repository.findById(id)
+    public EntityModel<UserModel> one(@PathVariable Long id) {
+        User user = userRepository.findById(id)
                 .orElseThrow(() -> new RegisterNotFoundException(id, "usuario"));
         log.info("Recuperado " + user);
-        return assembler.toModel(user);
+        return userAssembler.toModel(user);
     }
 
     @GetMapping
     public CollectionModel<UserListModel> all() {
-        return listAssembler.toCollection(repository.findAll());
+        log.info("Recuperados usuarios");
+        return userListAssembler.toCollection(userRepository.findAll());
     }
 
     @GetMapping("{id}/questions")
     public CollectionModel<QuestionListModel> questions(@PathVariable Long id) {
-        User user = repository.findById(id)
+        User user = userRepository.findById(id)
                 .orElseThrow(() -> new RegisterNotFoundException(id, "usuario"));
+        log.info("Recuperadas preguntas del usuario " + user);
         return questionListAssembler.toCollection(questionRepository.findQuestionByUser(user));
     }
 
+    @GetMapping("{id}/families")
+    public CollectionModel<FamilyListModel> families(@PathVariable Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RegisterNotFoundException(id, "usuario"));
+        log.info("Recuperados familias del usuario " + user);
+        return familyListAssembler.toCollection(familyRepository.findDistinctByQuestionsUser(user));
+    }
+
+    @PostMapping
+    public EntityModel<UserModel> add(@RequestBody UserPostModel model) {
+        model.setPassword(new BCryptPasswordEncoder().encode(model.getPassword()));
+        User user = userRepository.save(userAssembler.toEntity(model));
+        log.info("Añadido " + user);
+        return userAssembler.toModel(user);
+    }
+
+    @PostMapping("{id}/add-question")
+    public EntityModel<QuestionModel> addQuestion(@Valid @RequestBody QuestionPostModel model, @PathVariable Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RegisterNotFoundException(id, "usuario"));
+        model.setUser(user);
+        Question question = questionRepository.save(questionAssembler.toEntity(model));
+        log.info("Añadida " + question + " del usuario " + user);
+        return questionAssembler.toModel(question);
+    }
+
     @PutMapping("{id}")
-    public EntityModel<User> edit(@PathVariable Long id, @RequestBody UserPutModel model) {
-        User user = repository.findById(id).map(u -> {
+    public EntityModel<UserModel> edit(@Valid @RequestBody UserPutModel model, @PathVariable Long id) {
+        User user = userRepository.findById(id).map(u -> {
                     u.setName(model.getName());
                     u.setUsername(model.getUsername());
-                    return repository.save(u);
+                    return userRepository.save(u);
                 })
                 .orElseThrow(() -> new RegisterNotFoundException(id, "usuario"));
         log.info("Actualizado " + user);
-        return assembler.toModel(user);
+        return userAssembler.toModel(user);
+    }
+
+    @PutMapping("{id}/edit-password")
+    public EntityModel<UserModel> editPassword(@Valid @RequestBody UserChangePasswordModel model, @PathVariable Long id) {
+        User user = userRepository.findById(id).map(u -> {
+                    u.setPassword(new BCryptPasswordEncoder().encode(model.getPassword()));
+                    return userRepository.save(u);
+                })
+                .orElseThrow(() -> new RegisterNotFoundException(id, "usuario"));
+        log.info("Cambiada contraseña del usuario " + user);
+        return userAssembler.toModel(user);
     }
 
     @DeleteMapping("{id}")
     public void delete(@PathVariable Long id) {
         log.info("Borrado usuario " + id);
-        repository.deleteById(id);
+        userRepository.deleteById(id);
+    }
+
+    @EventListener
+    public void seed(ContextRefreshedEvent event) {
+        seedUsersTable();
+    }
+
+    private void seedUsersTable() {
+        String sql = "SELECT USERNAME FROM users";
+        List<User> u = jdbcTemplate.query(sql, (resultSet, rowNum) -> null);
+        if (u.size() == 0) {
+            Administrator user = new Administrator();
+            user.setName("Javier Tomás Acín");
+            user.setUsername("jtomaci");
+            user.setPassword(new BCryptPasswordEncoder().encode("password"));
+            userRepository.save(user);
+            log.info("Users Seeded");
+        } else {
+            log.info("Users Seeding Not Required");
+        }
     }
 }
 

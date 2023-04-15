@@ -1,38 +1,33 @@
 package es.mdef.gestionpedidos.entities;
 
+import es.mdef.gestionpedidos.constants.UserEnums;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 
 @Entity
-@DiscriminatorValue("NotAdministrator")
+@DiscriminatorValue("NotAdmin")
 public class NotAdministrator extends User {
-    private Type type;
-    private Department department;
+    private UserEnums.Type type;
+    private UserEnums.Department department;
 
-    public Type getType() {
+    public UserEnums.Type getType() {
         return type;
     }
 
-    public void setType(Type type) {
+    public void setType(UserEnums.Type type) {
         this.type = type;
     }
 
-    public Department getDepartment() {
+    public UserEnums.Department getDepartment() {
         return department;
     }
 
-    public void setDepartment(Department department) {
+    public void setDepartment(UserEnums.Department department) {
         this.department = department;
     }
 
-    public enum Type {
-        Alumno,
-        Docente,
-        Administracion
-    }
-
-    public enum Department {
-        EMIES,
-        CCESP
+    @Override
+    public UserEnums.Role getRole() {
+        return UserEnums.Role.NotAdmin;
     }
 }

@@ -1,6 +1,7 @@
 package es.mdef.gestionpedidos.entities;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 
 @Entity
 @Table(name = "questions")
@@ -9,6 +10,7 @@ public class Question {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(nullable = false, unique = true)
+    @Size(max = 100, min = 5, message = "El enunciado debe contener entre 5 y 100 caracteres")
     private String statement;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
