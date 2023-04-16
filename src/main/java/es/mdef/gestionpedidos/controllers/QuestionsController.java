@@ -58,6 +58,7 @@ public class QuestionsController {
         Question question = questionRepository.findById(id).map(q -> {
                     q.setStatement(model.getStatement());
                     q.setUser(model.getUser());
+                    q.setFamily(model.getFamily());
                     return questionRepository.save(q);
                 })
                 .orElseThrow(() -> new RegisterNotFoundException(id, "pregunta"));

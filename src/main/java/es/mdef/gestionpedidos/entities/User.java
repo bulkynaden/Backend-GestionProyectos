@@ -103,7 +103,6 @@ public class User implements UserDetails {
         return null;
     }
 
-
     @Transient
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
