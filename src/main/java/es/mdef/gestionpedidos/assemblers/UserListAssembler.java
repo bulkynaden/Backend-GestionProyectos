@@ -5,6 +5,7 @@ import es.mdef.gestionpedidos.entities.User;
 import es.mdef.gestionpedidos.models.user.UserListModel;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -17,7 +18,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 @Component
 public class UserListAssembler implements RepresentationModelAssembler<User, UserListModel> {
     @Override
-    public UserListModel toModel(User entity) {
+    public @NonNull UserListModel toModel(@NonNull User entity) {
         UserListModel model = new UserListModel();
 
         model.setName(entity.getName());

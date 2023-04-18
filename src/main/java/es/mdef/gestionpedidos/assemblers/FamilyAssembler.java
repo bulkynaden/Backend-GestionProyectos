@@ -6,6 +6,7 @@ import es.mdef.gestionpedidos.models.family.FamilyModel;
 import es.mdef.gestionpedidos.models.family.FamilyPostModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
@@ -14,7 +15,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 @Component
 public class FamilyAssembler implements RepresentationModelAssembler<FamilyImpl, EntityModel<FamilyModel>> {
     @Override
-    public EntityModel<FamilyModel> toModel(FamilyImpl entity) {
+    public @NonNull EntityModel<FamilyModel> toModel(@NonNull FamilyImpl entity) {
         FamilyModel familyModel = new FamilyModel();
         familyModel.setStatement(entity.getStatement());
         familyModel.setLength(entity.getLength());

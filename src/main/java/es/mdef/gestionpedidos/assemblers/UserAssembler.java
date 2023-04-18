@@ -11,6 +11,7 @@ import es.mdef.gestionpedidos.models.user.UserModel;
 import es.mdef.gestionpedidos.models.user.UserPostModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
@@ -19,7 +20,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 @Component
 public class UserAssembler implements RepresentationModelAssembler<User, EntityModel<UserModel>> {
     @Override
-    public EntityModel<UserModel> toModel(User entity) {
+    public @NonNull EntityModel<UserModel> toModel(@NonNull User entity) {
         UserModel userModel;
 
         if (entity instanceof Administrator) {
@@ -42,7 +43,7 @@ public class UserAssembler implements RepresentationModelAssembler<User, EntityM
         userModel.setEnabled(entity.isEnabled());
         userModel.setAccountNonLocked(entity.isAccountNonLocked());
         userModel.setCredentialsNonExpired(entity.isCredentialsNonExpired());
-        
+
         EntityModel<UserModel> model = EntityModel.of(userModel);
         model.add(
                 linkTo(methodOn(UsersController.class).one(entity.getId())).withSelfRel(),

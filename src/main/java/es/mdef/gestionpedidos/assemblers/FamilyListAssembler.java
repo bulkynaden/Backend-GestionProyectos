@@ -5,6 +5,7 @@ import es.mdef.gestionpedidos.entities.FamilyImpl;
 import es.mdef.gestionpedidos.models.family.FamilyListModel;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -17,7 +18,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 @Component
 public class FamilyListAssembler implements RepresentationModelAssembler<FamilyImpl, FamilyListModel> {
     @Override
-    public FamilyListModel toModel(FamilyImpl entity) {
+    public @NonNull FamilyListModel toModel(@NonNull FamilyImpl entity) {
         FamilyListModel model = new FamilyListModel();
         model.setStatement(entity.getStatement());
         model.setLength(entity.getLength());

@@ -27,7 +27,7 @@ public class NotAdministrator extends User {
     }
 
     @Override
-    public UserEnums.Role getRole() {
-        return UserEnums.Role.NotAdmin;
+    public void setRole(UserEnums.Role role) {
+        super.setRole(UserEnums.Role.NotAdmin);
     }
 }

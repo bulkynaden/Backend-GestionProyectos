@@ -12,6 +12,10 @@ public class Administrator extends User {
             message = "El teléfono no tiene el formato correcto")
     private String phone;
 
+    public Administrator() {
+        super();
+    }
+
     public String getPhone() {
         return phone;
     }
@@ -21,7 +25,7 @@ public class Administrator extends User {
     }
 
     @Override
-    public UserEnums.Role getRole() {
-        return UserEnums.Role.Admin;
+    public void setRole(UserEnums.Role role) {
+        super.setRole(UserEnums.Role.Admin);
     }
 }

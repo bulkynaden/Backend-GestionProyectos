@@ -22,7 +22,6 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,8 +37,6 @@ public class UsersController {
     private final QuestionListAssembler questionListAssembler;
     private final FamilyListAssembler familyListAssembler;
     private final Logger log;
-    private final JdbcTemplate jdbcTemplate;
-
 
     public UsersController(UserRepository userRepository,
                            QuestionRepository questionRepository,
@@ -48,7 +45,7 @@ public class UsersController {
                            QuestionAssembler questionAssembler,
                            UserListAssembler userListAssembler,
                            QuestionListAssembler questionListAssembler,
-                           FamilyListAssembler familyListAssembler, JdbcTemplate jdbcTemplate) {
+                           FamilyListAssembler familyListAssembler) {
         this.userRepository = userRepository;
         this.questionRepository = questionRepository;
         this.familyRepository = familyRepository;
@@ -57,7 +54,6 @@ public class UsersController {
         this.userListAssembler = userListAssembler;
         this.questionListAssembler = questionListAssembler;
         this.familyListAssembler = familyListAssembler;
-        this.jdbcTemplate = jdbcTemplate;
         this.log = GestionPedidosApplication.log;
     }
 

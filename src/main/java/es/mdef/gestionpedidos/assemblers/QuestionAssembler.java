@@ -12,6 +12,7 @@ import es.mdef.gestionpedidos.repositories.FamilyRepository;
 import es.mdef.gestionpedidos.repositories.UserRepository;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
@@ -30,7 +31,7 @@ public class QuestionAssembler implements RepresentationModelAssembler<Question,
     }
 
     @Override
-    public EntityModel<QuestionModel> toModel(Question entity) {
+    public @NonNull EntityModel<QuestionModel> toModel(@NonNull Question entity) {
         QuestionModel questionModel = new QuestionModel();
         questionModel.setStatement(entity.getStatement());
         EntityModel<QuestionModel> model = EntityModel.of(questionModel);

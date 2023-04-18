@@ -20,7 +20,7 @@ public class FamilyImpl implements Family {
     @Column(nullable = false, unique = true)
     private String statement;
 
-    @OneToMany(mappedBy = "family")
+    @OneToMany(mappedBy = "family", cascade = CascadeType.ALL)
     private List<Question> questions = new ArrayList<>();
 
     public Long getId() {

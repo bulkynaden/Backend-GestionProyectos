@@ -33,6 +33,9 @@ public class User implements UserDetails {
     private String password;
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Question> questions = new ArrayList<>();
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role")
+    private UserEnums.Role role;
     @Column(name = "cuenta_activa")
     private boolean accountNonExpired = true;
     @Column(name = "cuenta_desbloqueada")
@@ -41,6 +44,10 @@ public class User implements UserDetails {
     private boolean credentialsNonExpired = true;
     @Column(name = "habilitada")
     private boolean enabled = true;
+
+    public User() {
+        setRole(null);
+    }
 
     public Long getId() {
         return id;
@@ -100,7 +107,11 @@ public class User implements UserDetails {
     }
 
     public UserEnums.Role getRole() {
-        return null;
+        return this.role;
+    }
+
+    public void setRole(UserEnums.Role role) {
+        this.role = role;
     }
 
     @Transient
