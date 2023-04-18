@@ -42,7 +42,7 @@ public class UserAssembler implements RepresentationModelAssembler<User, EntityM
         userModel.setEnabled(entity.isEnabled());
         userModel.setAccountNonLocked(entity.isAccountNonLocked());
         userModel.setCredentialsNonExpired(entity.isCredentialsNonExpired());
-
+        
         EntityModel<UserModel> model = EntityModel.of(userModel);
         model.add(
                 linkTo(methodOn(UsersController.class).one(entity.getId())).withSelfRel(),

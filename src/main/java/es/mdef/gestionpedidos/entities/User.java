@@ -31,7 +31,7 @@ public class User implements UserDetails {
     @NotBlank(message = "La contraseña es obligatoria")
     @Column(nullable = false)
     private String password;
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Question> questions = new ArrayList<>();
     @Column(name = "cuenta_activa")
     private boolean accountNonExpired = true;

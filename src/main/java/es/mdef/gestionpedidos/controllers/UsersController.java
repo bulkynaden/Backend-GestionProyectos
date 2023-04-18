@@ -26,8 +26,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/users")
 public class UsersController {
@@ -106,8 +104,11 @@ public class UsersController {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RegisterNotFoundException(id, "usuario"));
         model.setUser(user);
-        Question question = questionRepository.save(questionAssembler.toEntity(model));
-        log.info("Añadida " + question + " del usuario " + user);
+        Question question = questionAssembler.toEntity(model);
+        log.info("question" + question.getUser() + question.getFamily());
+        user.getQuestions().add(question);
+        userRepository.save(user);
+        log.info("Añadida pregunta del usuario " + user);
         return questionAssembler.toModel(question);
     }
 
@@ -153,17 +154,15 @@ public class UsersController {
     }
 
     private void seedUsersTable() {
-        String sql = "SELECT USERNAME FROM users";
-        List<User> u = jdbcTemplate.query(sql, (resultSet, rowNum) -> null);
-        if (u.size() == 0) {
+        if (userRepository.findAll().isEmpty()) {
             Administrator user = new Administrator();
             user.setName("Javier Tomás Acín");
             user.setUsername("jtomaci");
             user.setPassword(new BCryptPasswordEncoder().encode("password"));
             userRepository.save(user);
-            log.info("Users Seeded");
+            log.info("Añadidos usuarios por defecto");
         } else {
-            log.info("Users Seeding Not Required");
+            log.info("No se ha requerido la carga de usuarios por defecto");
         }
     }
 }
