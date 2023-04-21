@@ -25,6 +25,8 @@ import org.springframework.hateoas.EntityModel;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/users")
 public class UsersController {
@@ -110,6 +112,8 @@ public class UsersController {
     @PutMapping("{id}")
     public EntityModel<UserModel> edit(@Valid @RequestBody UserPutModel model, @PathVariable Long id) {
         User user = userRepository.findById(id).orElseThrow(() -> new RegisterNotFoundException(id, "usuario"));
+        String password = user.getPassword();
+        List<Question> questions = user.getQuestions();
 
         if (user.getRole() == UserEnums.Role.Admin) {
             if (model.getRole() == UserEnums.Role.Admin) {
@@ -118,11 +122,13 @@ public class UsersController {
                 user = new NotAdministrator();
                 ((NotAdministrator) user).setType(model.getType());
                 ((NotAdministrator) user).setDepartment(model.getDepartment());
+                userRepository.deleteById(id);
             }
         } else if (user.getRole() == UserEnums.Role.NotAdmin) {
             if (model.getRole() == UserEnums.Role.Admin) {
                 user = new Administrator();
                 ((Administrator) user).setPhone(model.getPhone());
+                userRepository.deleteById(id);
             } else if (model.getRole() == UserEnums.Role.NotAdmin) {
                 ((NotAdministrator) user).setType(model.getType());
                 ((NotAdministrator) user).setDepartment(model.getDepartment());
@@ -130,11 +136,20 @@ public class UsersController {
         }
         user.setName(model.getName());
         user.setUsername(model.getUsername());
-
+        user.setPassword(password);
+      
         userRepository.save(user);
+        updateQuestionsToNewUser(questions, user);
 
         log.info("Actualizado " + user);
         return userAssembler.toModel(user);
+    }
+
+    private void updateQuestionsToNewUser(List<Question> questions, User newUser) {
+        questions.forEach(question -> {
+            question.setUser(newUser);
+            questionRepository.save(question);
+        });
     }
 
     @PutMapping("{id}/edit-password")
