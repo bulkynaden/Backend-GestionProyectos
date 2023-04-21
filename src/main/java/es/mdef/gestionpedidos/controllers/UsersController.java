@@ -101,7 +101,6 @@ public class UsersController {
                 .orElseThrow(() -> new RegisterNotFoundException(id, "usuario"));
         model.setUser(user);
         Question question = questionAssembler.toEntity(model);
-        log.info("question" + question.getUser() + question.getFamily());
         user.getQuestions().add(question);
         userRepository.save(user);
         log.info("Añadida pregunta del usuario " + user);
@@ -112,11 +111,22 @@ public class UsersController {
     public EntityModel<UserModel> edit(@Valid @RequestBody UserPutModel model, @PathVariable Long id) {
         User user = userRepository.findById(id).orElseThrow(() -> new RegisterNotFoundException(id, "usuario"));
 
-        if (model.getRole() == UserEnums.Role.Admin) {
-            ((Administrator) user).setPhone(model.getPhone());
-        } else if (model.getRole() == UserEnums.Role.NotAdmin) {
-            ((NotAdministrator) user).setType(model.getType());
-            ((NotAdministrator) user).setDepartment(model.getDepartment());
+        if (user.getRole() == UserEnums.Role.Admin) {
+            if (model.getRole() == UserEnums.Role.Admin) {
+                ((Administrator) user).setPhone(model.getPhone());
+            } else if (model.getRole() == UserEnums.Role.NotAdmin) {
+                user = new NotAdministrator();
+                ((NotAdministrator) user).setType(model.getType());
+                ((NotAdministrator) user).setDepartment(model.getDepartment());
+            }
+        } else if (user.getRole() == UserEnums.Role.NotAdmin) {
+            if (model.getRole() == UserEnums.Role.Admin) {
+                user = new Administrator();
+                ((Administrator) user).setPhone(model.getPhone());
+            } else if (model.getRole() == UserEnums.Role.NotAdmin) {
+                ((NotAdministrator) user).setType(model.getType());
+                ((NotAdministrator) user).setDepartment(model.getDepartment());
+            }
         }
         user.setName(model.getName());
         user.setUsername(model.getUsername());
@@ -162,4 +172,3 @@ public class UsersController {
         }
     }
 }
-

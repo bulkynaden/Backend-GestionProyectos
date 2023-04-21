@@ -17,7 +17,6 @@ public class UserListModel extends RepresentationModel<UserListModel> {
         this.name = name;
     }
 
-
     public UserEnums.Role getRole() {
         return role;
     }
