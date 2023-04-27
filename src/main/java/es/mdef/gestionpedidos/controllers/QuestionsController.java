@@ -6,7 +6,6 @@ import es.mdef.gestionpedidos.assemblers.QuestionListAssembler;
 import es.mdef.gestionpedidos.entities.Question;
 import es.mdef.gestionpedidos.errors.RegisterNotFoundException;
 import es.mdef.gestionpedidos.models.question.QuestionListModel;
-import es.mdef.gestionpedidos.models.question.QuestionModel;
 import es.mdef.gestionpedidos.models.question.QuestionPostModel;
 import es.mdef.gestionpedidos.repositories.QuestionRepository;
 import jakarta.validation.Valid;
@@ -33,7 +32,7 @@ public class QuestionsController {
 
 
     @GetMapping("{id}")
-    public EntityModel<QuestionModel> one(@PathVariable Long id) {
+    public EntityModel<Question> one(@PathVariable Long id) {
         Question question = questionRepository.findById(id)
                 .orElseThrow(() -> new RegisterNotFoundException(id, "pregunta"));
         log.info("Recuperado " + question);
@@ -47,19 +46,19 @@ public class QuestionsController {
     }
 
     @PostMapping
-    public EntityModel<QuestionModel> add(@Valid @RequestBody QuestionPostModel model) {
+    public EntityModel<Question> add(@Valid @RequestBody QuestionPostModel model) {
         Question question = questionRepository.save(assembler.toEntity(model));
         log.info("Añadida " + question);
         return assembler.toModel(question);
     }
 
     @PutMapping("{id}")
-    public EntityModel<QuestionModel> edit(@Valid @RequestBody QuestionPostModel model, @PathVariable Long id) {
+    public EntityModel<Question> edit(@Valid @RequestBody QuestionPostModel model, @PathVariable Long id) {
         Question question = questionRepository.findById(id).map(q -> {
                     q.setStatement(model.getStatement());
                     q.setUser(model.getUser());
                     q.setFamily(model.getFamily());
-                    
+
                     return questionRepository.save(q);
                 })
                 .orElseThrow(() -> new RegisterNotFoundException(id, "pregunta"));

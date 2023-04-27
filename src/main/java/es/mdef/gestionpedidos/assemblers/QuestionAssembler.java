@@ -6,7 +6,6 @@ import es.mdef.gestionpedidos.controllers.UsersController;
 import es.mdef.gestionpedidos.entities.FamilyImpl;
 import es.mdef.gestionpedidos.entities.Question;
 import es.mdef.gestionpedidos.entities.User;
-import es.mdef.gestionpedidos.models.question.QuestionModel;
 import es.mdef.gestionpedidos.models.question.QuestionPostModel;
 import es.mdef.gestionpedidos.repositories.FamilyRepository;
 import es.mdef.gestionpedidos.repositories.UserRepository;
@@ -21,7 +20,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @Component
-public class QuestionAssembler implements RepresentationModelAssembler<Question, EntityModel<QuestionModel>> {
+public class QuestionAssembler implements RepresentationModelAssembler<Question, EntityModel<Question>> {
     private final UserRepository userRepository;
     private final FamilyRepository familyRepository;
 
@@ -31,10 +30,8 @@ public class QuestionAssembler implements RepresentationModelAssembler<Question,
     }
 
     @Override
-    public @NonNull EntityModel<QuestionModel> toModel(@NonNull Question entity) {
-        QuestionModel questionModel = new QuestionModel();
-        questionModel.setStatement(entity.getStatement());
-        EntityModel<QuestionModel> model = EntityModel.of(questionModel);
+    public @NonNull EntityModel<Question> toModel(@NonNull Question entity) {
+        EntityModel<Question> model = EntityModel.of(entity);
 
         model.add(
                 linkTo(methodOn(QuestionsController.class).one(entity.getId())).withSelfRel(),
@@ -47,6 +44,8 @@ public class QuestionAssembler implements RepresentationModelAssembler<Question,
     public Question toEntity(QuestionPostModel model) {
         Question question = new Question();
         question.setStatement(model.getStatement());
+        question.setFamily(model.getFamily());
+        question.setUser(model.getUser());
 
         Optional<User> userOptional = userRepository.findById(model.getUser().getId());
         if (userOptional.isPresent()) {
@@ -59,6 +58,7 @@ public class QuestionAssembler implements RepresentationModelAssembler<Question,
             FamilyImpl family = familyOptional.get();
             question.setFamily(family);
         }
+
         return question;
     }
 }

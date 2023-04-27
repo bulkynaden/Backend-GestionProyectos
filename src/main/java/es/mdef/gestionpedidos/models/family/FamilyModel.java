@@ -1,9 +1,10 @@
 package es.mdef.gestionpedidos.models.family;
 
+import org.springframework.hateoas.RepresentationModel;
 import org.springframework.hateoas.server.core.Relation;
 
 @Relation(itemRelation = "family")
-public class FamilyModel {
+public class FamilyModel extends RepresentationModel<FamilyModel> {
     private String statement;
     private int length;
 

@@ -10,7 +10,6 @@ import es.mdef.gestionpedidos.entities.User;
 import es.mdef.gestionpedidos.errors.RegisterNotFoundException;
 import es.mdef.gestionpedidos.models.family.FamilyListModel;
 import es.mdef.gestionpedidos.models.question.QuestionListModel;
-import es.mdef.gestionpedidos.models.question.QuestionModel;
 import es.mdef.gestionpedidos.models.question.QuestionPostModel;
 import es.mdef.gestionpedidos.models.user.*;
 import es.mdef.gestionpedidos.repositories.FamilyRepository;
@@ -98,7 +97,7 @@ public class UsersController {
     }
 
     @PostMapping("{id}/add-question")
-    public EntityModel<QuestionModel> addQuestion(@Valid @RequestBody QuestionPostModel model, @PathVariable Long id) {
+    public EntityModel<Question> addQuestion(@Valid @RequestBody QuestionPostModel model, @PathVariable Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RegisterNotFoundException(id, "usuario"));
         model.setUser(user);
@@ -137,7 +136,7 @@ public class UsersController {
         user.setName(model.getName());
         user.setUsername(model.getUsername());
         user.setPassword(password);
-      
+
         userRepository.save(user);
         updateQuestionsToNewUser(questions, user);
 

@@ -2,10 +2,11 @@ package es.mdef.gestionpedidos.models.question;
 
 import es.mdef.gestionpedidos.entities.FamilyImpl;
 import es.mdef.gestionpedidos.entities.User;
+import org.springframework.hateoas.RepresentationModel;
 import org.springframework.hateoas.server.core.Relation;
 
 @Relation(itemRelation = "question")
-public class QuestionPostModel {
+public class QuestionPostModel extends RepresentationModel<QuestionPostModel> {
     private String statement;
     private User user;
     private FamilyImpl family;

@@ -1,6 +1,8 @@
 package es.mdef.gestionpedidos.models.user;
 
-public class UserChangePasswordModel {
+import org.springframework.hateoas.RepresentationModel;
+
+public class UserChangePasswordModel extends RepresentationModel<UserChangePasswordModel> {
     private String password;
 
     public String getPassword() {

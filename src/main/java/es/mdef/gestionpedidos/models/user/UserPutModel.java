@@ -1,10 +1,11 @@
 package es.mdef.gestionpedidos.models.user;
 
 import es.mdef.gestionpedidos.constants.UserEnums;
+import org.springframework.hateoas.RepresentationModel;
 import org.springframework.hateoas.server.core.Relation;
 
 @Relation(itemRelation = "user")
-public class UserPutModel {
+public class UserPutModel extends RepresentationModel<UserPutModel> {
     private String name;
     private String username;
     private UserEnums.Department department;
