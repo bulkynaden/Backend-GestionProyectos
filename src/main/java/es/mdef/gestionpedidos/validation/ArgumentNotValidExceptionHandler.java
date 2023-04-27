@@ -49,7 +49,7 @@ public class ArgumentNotValidExceptionHandler {
         errorResponse.setStatus(HttpStatus.CONFLICT.value());
         errorResponse.setError("Data Integrity Violation");
         errorResponse.setMessage("Valor duplicado en la base de datos");
-        
+
         return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
     }
 }

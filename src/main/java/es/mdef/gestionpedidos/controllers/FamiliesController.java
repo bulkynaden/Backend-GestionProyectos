@@ -99,7 +99,6 @@ public class FamiliesController {
         FamilyImpl savedFamily = familyRepository.save(family);
         EntityModel<FamilyModel> familyEntityModel = familyAssembler.toModel(savedFamily);
 
-        log.info("Añadida familia" + family);
         return ResponseEntity.created(familyEntityModel.getRequiredLink(IanaLinkRelations.SELF).toUri())
                 .body(familyEntityModel);
     }
