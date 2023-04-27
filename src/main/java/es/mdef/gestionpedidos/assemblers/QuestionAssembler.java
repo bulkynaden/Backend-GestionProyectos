@@ -3,9 +3,7 @@ package es.mdef.gestionpedidos.assemblers;
 import es.mdef.gestionpedidos.controllers.FamiliesController;
 import es.mdef.gestionpedidos.controllers.QuestionsController;
 import es.mdef.gestionpedidos.controllers.UsersController;
-import es.mdef.gestionpedidos.entities.FamilyImpl;
 import es.mdef.gestionpedidos.entities.Question;
-import es.mdef.gestionpedidos.entities.User;
 import es.mdef.gestionpedidos.models.question.QuestionPostModel;
 import es.mdef.gestionpedidos.repositories.FamilyRepository;
 import es.mdef.gestionpedidos.repositories.UserRepository;
@@ -13,8 +11,6 @@ import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
-
-import java.util.Optional;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
@@ -46,18 +42,6 @@ public class QuestionAssembler implements RepresentationModelAssembler<Question,
         question.setStatement(model.getStatement());
         question.setFamily(model.getFamily());
         question.setUser(model.getUser());
-
-        Optional<User> userOptional = userRepository.findById(model.getUser().getId());
-        if (userOptional.isPresent()) {
-            User user = userOptional.get();
-            question.setUser(user);
-        }
-
-        Optional<FamilyImpl> familyOptional = familyRepository.findById(model.getFamily().getId());
-        if (familyOptional.isPresent()) {
-            FamilyImpl family = familyOptional.get();
-            question.setFamily(family);
-        }
 
         return question;
     }
