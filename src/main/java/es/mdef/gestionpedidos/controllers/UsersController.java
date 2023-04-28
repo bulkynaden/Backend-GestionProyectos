@@ -101,10 +101,12 @@ public class UsersController {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RegisterNotFoundException(id, "usuario"));
         model.setUser(user);
-        Question question = questionAssembler.toEntity(model);
+        
+        Question question = questionRepository.save(questionAssembler.toEntity(model));
+
         user.getQuestions().add(question);
         userRepository.save(user);
-        log.info("Añadida pregunta del usuario " + user);
+
         return questionAssembler.toModel(question);
     }
 

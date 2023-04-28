@@ -21,15 +21,13 @@ public class QuestionsController {
     private final QuestionAssembler assembler;
     private final QuestionListAssembler listAssembler;
     private final Logger log;
-
-
+    
     public QuestionsController(QuestionRepository questionRepository, QuestionAssembler assembler, QuestionListAssembler listAssembler) {
         this.questionRepository = questionRepository;
         this.assembler = assembler;
         this.listAssembler = listAssembler;
         this.log = GestionPedidosApplication.log;
     }
-
 
     @GetMapping("{id}")
     public EntityModel<Question> one(@PathVariable Long id) {

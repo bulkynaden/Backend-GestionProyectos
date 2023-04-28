@@ -5,8 +5,6 @@ import es.mdef.gestionpedidos.controllers.QuestionsController;
 import es.mdef.gestionpedidos.controllers.UsersController;
 import es.mdef.gestionpedidos.entities.Question;
 import es.mdef.gestionpedidos.models.question.QuestionPostModel;
-import es.mdef.gestionpedidos.repositories.FamilyRepository;
-import es.mdef.gestionpedidos.repositories.UserRepository;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
 import org.springframework.lang.NonNull;
@@ -17,14 +15,6 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @Component
 public class QuestionAssembler implements RepresentationModelAssembler<Question, EntityModel<Question>> {
-    private final UserRepository userRepository;
-    private final FamilyRepository familyRepository;
-
-    public QuestionAssembler(UserRepository userRepository, FamilyRepository familyRepository) {
-        this.userRepository = userRepository;
-        this.familyRepository = familyRepository;
-    }
-
     @Override
     public @NonNull EntityModel<Question> toModel(@NonNull Question entity) {
         EntityModel<Question> model = EntityModel.of(entity);
